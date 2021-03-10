@@ -12,78 +12,51 @@ namespace grafica_curs3
 {
     public partial class Form1 : Form
     {
-        private static Graphics gfx;
+
+        static Graphics gfx;
+        static Pen pen = new Pen(Color.Black); //culoarea liniei
+        static PointF[] points; //punctele x y z
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent(); //porneste programul
         }
 
-        Bitmap bmp;
-        Graphics grp;
-        static Random rnd = new Random();
-        public class point
+        private void Draw_Click(object sender, EventArgs e)
         {
-            public float x, y;
-            public point()
-            {
-                x = rnd.Next(900);
-                y = rnd.Next(600);
-            }
-            public void Draw(Graphics grp)
-            {
-                grp.DrawEllipse(new Pen(Color.Red, 2), x, y, 2, 2);
-            }
-        }
 
-        private List<point> points = new List<point>();
+            points = new PointF[]
+            {
+                new PointF(float.Parse(textBox1.Text),float.Parse(textBox2.Text)), //x ia valori Xa, Xb
+                new PointF(float.Parse(textBox4.Text),float.Parse(textBox3.Text)), //y ia valori Ya, Yb
+                new PointF(float.Parse(textBox6.Text),float.Parse(textBox5.Text)), //z ia valori Za, Zb
+            };
+
+            gfx.Clear(Color.White);
+            gfx.DrawPolygon(pen, points); //afiseaza forma triunghiului
+
+
+
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            gfx = pictureBox1.CreateGraphics();
-
+            gfx = pictureBox1.CreateGraphics(); //locul unde este afisat forma geometrica
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-          
-            point newPoint = new point();
-            string[] text = textBox1.Text.Split(new[] { ' ' });
-            newPoint.x = Int32.Parse(text[0]);
-            newPoint.y = Int32.Parse(text[1]);
-
-            points.Add(newPoint);
-            foreach (var p in points)
-            {
-                gfx.FillEllipse(new SolidBrush(Color.Black), p.x, p.y, 2, 2);
-            }
-
-            for (int i = 1; i < points.Count; i++)
-            {
-                gfx.DrawLine(Pens.Black, points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
-            }
-
-            int len = points.Count;
-
-            gfx.DrawLine(Pens.Black, points[len - 1].x, points[len - 1].y, points[0].x, points[0].y);
-
-            textBox1.Text = "";
-            gfx.Clear(Color.White);
-
+        private void Medians_Click(object sender, EventArgs e)
+        { //medianele lui x y z
+            PointF midline1 = new PointF(((points[1].X + points[2].X) / 2), ((points[1].Y + points[2].Y) / 2));
+            gfx.DrawLine(pen, points[0], midline1);
+            PointF midline2 = new PointF(((points[0].X + points[2].X) / 2), ((points[0].Y + points[2].Y) / 2));
+            gfx.DrawLine(pen, points[1], midline2);
+            PointF midline3 = new PointF(((points[0].X + points[1].X) / 2), ((points[0].Y + points[1].Y) / 2));
+            gfx.DrawLine(pen, points[2], midline3);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Clear_Click(object sender, EventArgs e)
         {
-            int len = points.Count;
-            for (int i = 0; i < len; i++)
-            {
-                point p1 = points[(i + 1) % 3];
-                point p2 = points[(i + 2) % 3];
-
-                point p0 = points[i];
-
-                gfx.FillEllipse(new SolidBrush(Color.Red), p0.x, p0.y, 2, 2);
-                gfx.DrawLine(Pens.Red, p0.x, p0.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-            }
+            gfx.Clear(Color.White); //sterge forma anterioara
         }
     }
 }
+
